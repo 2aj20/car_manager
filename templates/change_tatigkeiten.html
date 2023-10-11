@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+<div class="container">
+    <form method="POST" class="box">
+        <h2 class="title">{{ title }}</h2>
+
+        {{ form.csrf_token }}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <article class="message is-{{category}}">
+            <div class="message-body">
+                {{ message }}
+            </div>
+        </article>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <div class="field">
+            <label class="label">Name</label>
+            <div class="control">
+                {% if form.name.errors %}
+                {{ form.name(class_="input is-warning",placeholder="Name")}}
+                {% else %}
+                {{ form.name(class_="input",placeholder="Name")}}
+                {% endif %}
+            </div>
+            {% for error in form.name.errors %}
+            <article class="message is-warning">
+                <div class="message-body"> {{ error }}
+                </div>
+            </article>
+            {% endfor%}
+        </div>
+
+        <div class="field">
+            <label class="label">Intervall</label>
+            <div class="control">
+                {% if form.intervall.errors %}
+                {{ form.intervall(class_="input is-warning",placeholder="Intervall")}}
+                {% else %}
+                {{ form.intervall(class_="input",placeholder="Intervall")}}
+                {% endif %}
+            </div>
+            {% for error in form.intervall.errors %}
+            <article class="message is-warning">
+                <div class="message-body">
+                    {{ error }}
+                </div>
+            </article>
+            {% endfor%}
+        </div>
+
+        <div class="field is-grouped">
+            <div class="control">
+                <button type="submit" class="button is-link"> {{ btn_action }}</button>
+            </div>
+            <div class="control">
+                <a class="button is-link is-light"
+                   href="{{url_for('wartungsintervall')}}#arbeit_{{car_repair_exist_id}}">Abbrechen</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

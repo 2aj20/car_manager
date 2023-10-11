@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+
+<h2 class="title">{{ title }}</h2>
+
+<div class="box">
+
+    <div class="columns is-mobile">
+        <div class="column">
+            <table>
+                <thead>
+                <tr>
+                    <th>Gesamt KM</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td> {{ total_kilometers }}</td>
+                </tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                <tr>
+                    <th>selbstgefahren KM</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td> {{ own_kilometers }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="column">
+            <table>
+                <thead>
+                <tr>
+                    <th>Gesamt Liter</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td> {{ total_liters }}</td>
+                </tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                <tr>
+                    <th>Kosten (Sprit)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td> {{ total_costs }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="column">
+            <table>
+                <thead>
+                <tr>
+                    <th>Durchschnitt Verbrauch (der Einzelwerte)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td> {{ av_consumption }}</td>
+                </tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                <tr>
+                    <th>Median Verbrauch (der Einzelwerte)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td> {{ median_consumption }}</td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <div class="column">
+            <table>
+                <thead>
+                <tr>
+                    <th>Durchschnitt Preis pro 100km (Sprit)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td> {{ av_price_per_100km }}</td>
+                </tr>
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                <tr>
+                    <th>Durchschnitt Preis pro Liter (Sprit)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td> {{ av_price_per_liter }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!--  <th>Durchschnitt Verbrauch (total_liter*100/gef.km)</th>-->
+<!--<td> {{ gesamt_average_consumption_per_100km }}</td>-->
+
+<!-- ssti template injection!!!! -->
+
+<script src="{{ url_for('return_file_list_js') }}"></script>
+
+<a class="button is-success" href="{{ url_for('neuer_fillup') }}">neuer Eintrag</a>
+
+<div class="table-container" id="fillups">
+    <table class="table is-striped is-hoverable">
+        <thead>
+        <tr>
+            <th hidden="hidden" class="sortable">ID</th>
+            <th class="sort" data-sort="date">Datum</th>
+            <th class="sort" data-sort="gallons">Liter</th>
+            <th class="sort" data-sort="total_cost">Preis</th>
+            <th class="sort" data-sort="drived_meters">Gef. Km</th>
+            <th class="sort" data-sort="price_per_gallon">€/l</th>
+            <th class="sort" data-sort="price_per_100km">€/100km</th>
+            <th class="sort" data-sort="consumption_per_100km">Verbrauch pro 100km</th>
+            <th class="sort" data-sort="kmstand_nach_tanken">Kilometerstand nach Tanken</th>
+        </tr>
+        </thead>
+        <tbody class="list">
+        <!-- ssti template injection!!!! -->
+        {% for fill_up in fill_ups %}
+        <tr id="tankeintrag_{{ fill_up.fill_up_id }}">
+            <td hidden="hidden">{{ fill_up.fill_up_id }}</td>
+            <td class="date">{{ fill_up.date }}</td>
+            <td class="gallons">{{ fill_up.gallons }}</td>
+            <td class="total_cost">{{ fill_up.total_cost }}</td>
+            <td class="drived_meters">{{ fill_up.drived_meters }}</td>
+            <td class="price_per_gallon">{{ fill_up.price_per_gallon }}</td>
+            <td class="price_per_100km">{{ fill_up.price_per_100km }}</td>
+            <td class="consumption_per_100km">{{ fill_up.consumption_per_100km }}</td>
+            <td class="kmstand_nach_tanken">{{ fill_up.kilometers_after_fillup }}</td>
+
+            <td>
+                <a class="button" href="{{url_for('edit_fillup', fillup_id=fill_up.fill_up_id)}}">Ändern</a>
+            </td>
+            <td><a class="button is-danger" onclick="if (confirm('Eintrag wirklich löschen?')) {fetch('{{url_for('edit_fillup', fillup_id=fill_up.fill_up_id)}}', {
+        method: 'DELETE', headers: {'X-CSRFToken': '{{ csrf_token() }}' }, redirect: 'manual'}).then(response => {window.location.href='{{url_for('tanken')}}';}  )} else {
+           return false;
+       }">Löschen</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+var options = {
+  valueNames: [ 'date', 'gallons', 'total_cost', 'drived_meters', 'price_per_gallon', 'price_per_100km', 'consumption_per_100km', 'kmstand_nach_tanken' ]
+};
+
+// Init list
+var fillupList = new List('fillups', options);
+
+</script>
+
+<script>
+    document.querySelectorAll('.consumption_per_100km').forEach(function(elem) {
+    // Now do something with my button
+	if (elem.textContent<{{ consumption_green }}){
+elem.classList.add("has-text-success")}
+else if (elem.textContent>{{ consumption_red }}){
+elem.classList.add("has-text-danger")}
+});
+</script>
+{% endblock %}

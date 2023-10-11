@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+
+<script>
+window.addEventListener("load", function () {
+    document.getElementById("submitForm").addEventListener("click", submitForm);
+    document.getElementById("selected_car_id").addEventListener("change", resetSuccessMessage);
+});
+
+function resetSuccessMessage() {
+    document.getElementsByClassName("select")[0].classList.remove("is-success");
+    document.querySelector(".select").classList.remove("is-danger");
+    document.getElementById("message").textContent = '';
+}
+function submitForm() {
+    if (document.getElementById("select_car").reportValidity()) {
+        document.getElementById("submitForm").classList.add("is-loading");
+        resetSuccessMessage();
+        var data = new FormData(document.getElementById("select_car"));
+
+     fetch("{{ url_for('select_car') }}", {
+            method: "POST",
+            body: data
+        })
+             .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                alert("Verbindungsproblem :( Fehler");
+                throw new Error("Network response was not ok.");
+            }
+        })
+        .then(data => {
+            if (data.status === "1") {
+                document.getElementById("message").textContent = "Auto wurde ausgewählt.";
+                document.getElementById("message").className = "help is-success is-size-4";
+                document.getElementById("submitForm").classList.remove("is-loading");
+                document.querySelector(".select").classList.add("is-success");
+                document.querySelector(".select").classList.remove("is-danger");
+            }
+            else if (data.status === "0") {
+                document.getElementById("message").textContent = "Auto konnte nicht ausgewählt werden.";
+                document.getElementById("message").className = "help is-danger is-size-4";
+                document.getElementById("submitForm").classList.remove("is-loading");
+                document.querySelector(".select").classList.add("is-danger");
+            }
+        })
+        .catch(error => {
+            alert("Fehler mit Verbindung :(");
+            //console.error("Error:", error);
+        });
+    }
+}
+</script>
+
+
+<form id="select_car" class="box">
+    <noscript>
+        <p class="is-size-4 help is-danger">Um die Anwendung zu verwenden, muss JavaScript im Browser aktiviert
+            sein.</p>
+    </noscript>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <h2 class="title">{{ title }}</h2>
+    <div class="field ">
+        <label class="label">Auto:</label>
+        <div class="select">
+            <select name="selected_car_id" id="selected_car_id">
+                {% if not selected_car %}
+                <option selected="selected">Bitte wählen</option>
+                {% endif %}
+                {% for existing_car in existing_cars %}
+                <option value="{{existing_car.car_id}}" {% if existing_car.selected %} selected="selected" {% endif %}>
+                    {{existing_car.make}} {{existing_car.model}} {{existing_car.year}}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field is-grouped">
+            <div class="control">
+                <button class="button is-link" id="submitForm" type="button">Auswählen</button>
+            </div>
+            <div id="message"></div>
+        </div>
+    </div>
+</form>
+
+<a class="button is-success" href="{{ url_for('new_car') }}">neues Auto anlegen</a>
+{% endblock %}

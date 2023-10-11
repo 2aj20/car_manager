@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+<form action="{{ url_for('neue_steuer') }}" class="box" method="POST">
+    <h2 class="title">{{ title }}</h2>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="field">
+        <label class="label" for="date">Datum:</label>
+        <div class="control">
+            <input class="input" id="date" name="date" required type="date"></div>
+    </div>
+
+    <div class="field">
+        <label class="label" for="cost">Kosten:</label>
+        <div class="control">
+            <input class="input" id="cost" min="0.01" name="cost" required step=".01" type="number"></div>
+    </div>
+
+    <div class="field">
+        <label class="label" for="description">Kommentar:</label>
+        <div class="control">
+            <input class="input" id="description" name="description" value="">
+        </div>
+    </div>
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button class="button is-link" id="submit">Hinzufügen</button>
+        </div>
+        <div class="control">
+            <a class="button is-link is-light" href="{{ url_for('steuer') }}">Abbrechen</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

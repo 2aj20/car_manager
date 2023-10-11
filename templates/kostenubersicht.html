@@ -1,0 +1,433 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+    <!-- Styles amcharts -->
+    <style>
+    #chartDiv, #chart, #chartKosten {
+        width: 100%;
+        height: 500px;
+        max-width: 100%
+    }
+    </style>
+
+<h2 class="title">{{ title }}</h2>
+<script src="{{ url_for('return_file_list_js') }}"></script>
+<div class="table-container" id="list_years">
+    <table class="table is-striped is-hoverable" id="table_list_years">
+        <thead>
+        <tr>
+            <th class="sort" data-sort="year">Jahr</th>
+            <th class="sort" data-sort="drived_meters">Gef. Km</th>
+            <th class="sort" data-sort="tankcost">Tankkosten</th>
+            <th class="sort" data-sort="insurance">Versicherung</th>
+            <th class="sort" data-sort="tax">Steuer</th>
+            <th class="sort" data-sort="repair">Wartung/ Reparaturen</th>
+            <th class="sort" data-sort="costs">Gesamt</th>
+            <th class="sort" data-sort="costs_per_kilometer">Kosten pro km (in Cent)</th>
+        </tr>
+        </thead>
+        <tbody class="list">
+        <!-- ssti template injection!!!! -->
+        {% for item in list_table_data %}
+        <tr>
+            <td class="year">{{ item.year }}</td>
+            <td class="drived_meters">{{ item.drived_meters }}</td>
+            <td class="tankcost">{{ item.tankcost }}</td>
+            <td class="insurance">{{ item.insurance }}</td>
+            <td class="tax">{{ item.tax }}</td>
+            <td class="repair">{{ item.repair }}</td>
+            <td class="costs">{{ item.costs }}</td>
+            <td class="costs_per_kilometer">{{ item.costs_per_kilometer }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th>Gesamt</th>
+            <th>{{gesamt_drived_kilometers}}</th>
+            <th>{{gesamt_tank_cost}}</th>
+            <th>{{gesamt_insurance}}<br><a class="button" href="{{ url_for('versicherung') }}">Ändern</a></th>
+            <th>{{gesamt_tax}}<br><a class="button" href="{{ url_for('steuer') }}">Ändern</a></th>
+            <th>{{gesamt_repair}}</th>
+            <th>{{gesamt}}</th>
+            <th>
+                <div title="Gesamtkosten (ohne Kaufpreis)/gef. km">{{gesamt_pro_kilometer}}*</div>
+                <div title="Durchschnitt der oberen Werte">{{durchschnitt_pro_kilometer}}*</div>
+            </th>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+<script>
+var options = {
+  valueNames: [ 'year', 'drived_meters' , 'tankcost', 'insurance', 'tax', 'repair', 'costs', 'costs_per_kilometer' ]
+  };
+
+// Init list
+var list_yearsList = new List('list_years', options);
+</script>
+
+<br>
+<table class="table is-striped is-hoverable">
+    <tbody>
+    <tr>
+        <td>Laufende Kosten</td>
+        <td>{{gesamt}}</td>
+    </tr>
+    <tr>
+        <td>Kauf-Preis</td>
+        <td>
+            {{ buy_cost }}
+        <td>
+        <td>
+            <a class="button" href="{{ url_for('change_car') }}">Ändern</a>
+        </td>
+    </tr>
+    <tr>
+        <td>Kosten/Monat inkl Kaufpreis</td>
+        <td>{{costs_per_month_inkl_kaufpreis}}</td>
+    </tr>
+    <tr>
+        <td>Kosten/Monat ohne Kaufpreis</td>
+        <td>{{costs_per_month_ohne_kaufpreis}}</td>
+    </tr>
+    <tr>
+        <td>Gesamtkosten inkl Kaufpreis</td>
+        <td>{{gesamtkosten_inkl_kaufpreis}}</td>
+    </tr>
+    <tr>
+        <td>Kosten pro Kilometer inkl Kaufpreis (in Cent)</td>
+        <td>{{gesamt_pro_kilometer_inkl_kaufpreis}}</td>
+    </tr>
+    </tbody>
+</table>
+
+<br>
+
+<table class="table is-striped is-hoverable">
+    <tbody>
+    <tr>
+        <td>km -Stand</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>bei Kauf :</td>
+        <td>
+            {{ buy_kmstand }}
+        <td>
+        <td>
+            <a class="button" href="{{ url_for('change_car') }}">Ändern</a>
+        </td>
+    </tr>
+    <tr>
+        <td>gefahren:</td>
+        <td>{{gesamt_drived_kilometers}}</td>
+    </tr>
+    <tr>
+        <td>Laufleistung:</td>
+        <td>{{laufleistung}}</td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Resources -->
+<script src="{{ url_for('return_files_amcharts_index_js') }}"></script>
+<script src="{{ url_for('return_files_amcharts_xy_js') }}"></script>
+<script src="{{ url_for('return_files_amcharts_animated_js') }}"></script>
+
+<!--
+<script>
+am5.ready(function() {
+
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+var root = am5.Root.new("chartKosten");
+
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
+root.setThemes([
+  am5themes_Animated.new(root)
+]);
+
+// Create chart
+// https://www.amcharts.com/docs/v5/charts/xy-chart/
+var chart = root.container.children.push(am5xy.XYChart.new(root, {
+  panX: true,
+  panY: true,
+  wheelX: "panX",
+  wheelY: "zoomX",
+  pinchZoomX:true
+}));
+
+// Add cursor
+// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+  behavior: "none"
+}));
+cursor.lineY.set("visible", false);
+
+// Create axes
+// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+  maxDeviation: 0.2,
+  baseInterval: {
+    timeUnit: "year",
+    count: 1
+  },
+  renderer: am5xy.AxisRendererX.new(root, {}),
+  tooltip: am5.Tooltip.new(root, {})
+}));
+
+var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+  renderer: am5xy.AxisRendererY.new(root, {})
+}));
+
+// Add series
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+var series = chart.series.push(am5xy.LineSeries.new(root, {
+  name: "Series",
+  xAxis: xAxis,
+  yAxis: yAxis,
+  valueYField: "value",
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueY}"
+  })
+}));
+
+// Add scrollbar
+// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+chart.set("scrollbarX", am5.Scrollbar.new(root, {
+  orientation: "horizontal"
+}));
+
+am5.net.load("{{ url_for('chart', type_data='kosten') }}").then(function(result) {
+  // Parse data
+  var data = am5.JSONParser.parse(result.response);
+
+  // Process data
+  var processor = am5.DataProcessor.new(root, {
+    dateFields: ["date"],
+    dateFormat: "yyyy",
+    numericFields: ["value"]
+  });
+  processor.processMany(data);
+
+  // Use parsed/processed data
+  series.data.setAll(data);
+});
+
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/
+series.appear(1000);
+chart.appear(1000, 100);
+
+}); // end am5.ready()
+</script>
+
+<h3 class="title is-3">Kosten</h3>
+<div id="chartKosten"></div>
+
+-->
+
+<div id="chartDiv"></div>
+
+<script>
+am5.ready(function() {
+
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+var root = am5.Root.new("chartDiv");
+
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
+root.setThemes([
+  am5themes_Animated.new(root)
+]);
+
+// Create chart
+// https://www.amcharts.com/docs/v5/charts/xy-chart/
+var chart = root.container.children.push(am5xy.XYChart.new(root, {
+  panX: true,
+  panY: true,
+  wheelX: "panX",
+  wheelY: "zoomX",
+  pinchZoomX:true
+}));
+
+// Add cursor
+// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+  behavior: "none"
+}));
+cursor.lineY.set("visible", false);
+
+function getDatas(cell_class_name) {
+// extract data from table
+const table = document.getElementById("table_list_years");
+const rows = table.tBodies[0].rows;
+const data = [];
+
+for (let i = 0; i < rows.length; i++) {
+  const year = rows[i].cells[0].textContent;
+  //const drived_meters = parseFloat(rows[i].cells[1].textContent);
+  const value = parseFloat(rows[i].querySelector(cell_class_name).textContent);
+
+  data.push({
+    date: year,
+    value: value,
+  });
+}
+  return data;
+}
+
+// Create axes
+// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+  maxDeviation: 0.2,
+  baseInterval: {
+    timeUnit: "year",
+    count: 1
+  },
+  renderer: am5xy.AxisRendererX.new(root, {}),
+  tooltip: am5.Tooltip.new(root, {})
+}));
+
+var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+  renderer: am5xy.AxisRendererY.new(root, {})
+}));
+
+// Add series
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+var series = chart.series.push(am5xy.LineSeries.new(root, {
+  name: "gef KM",
+  xAxis: xAxis,
+  yAxis: yAxis,
+  valueYField: "value",
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{name} {valueY}"
+  })
+}));
+
+// Add scrollbar
+// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+chart.set("scrollbarX", am5.Scrollbar.new(root, {
+  orientation: "horizontal"
+}));
+/*
+// Set data
+var data = getDatas('.drived_meters');
+  // Process data
+  var processor = am5.DataProcessor.new(root, {
+    dateFields: ["date"],
+    dateFormat: "yyyy",
+    numericFields: ["value"]
+  });
+  processor.processMany(data);
+series.data.setAll(data);
+*/
+// Add series
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+var series2 = chart.series.push(am5xy.LineSeries.new(root, {
+  name: "Tankkosten",
+  xAxis: xAxis,
+  yAxis: yAxis,
+  valueYField: "value",
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{name} {valueY}"
+  })
+}));
+
+var data = getDatas('.tankcost');
+  // Process data
+  var processor = am5.DataProcessor.new(root, {
+    dateFields: ["date"],
+    dateFormat: "yyyy",
+    numericFields: ["value"]
+  });
+  processor.processMany(data);
+series2.data.setAll(data);
+
+// Add series
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+var series3 = chart.series.push(am5xy.LineSeries.new(root, {
+  name: "Versicherung",
+  xAxis: xAxis,
+  yAxis: yAxis,
+  valueYField: "value",
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{name} {valueY}"
+  })
+}));
+
+var data = getDatas('.insurance');
+  // Process data
+  var processor = am5.DataProcessor.new(root, {
+    dateFields: ["date"],
+    dateFormat: "yyyy",
+    numericFields: ["value"]
+  });
+  processor.processMany(data);
+series3.data.setAll(data);
+
+
+// Add series
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+var series4 = chart.series.push(am5xy.LineSeries.new(root, {
+  name: "Steuer",
+  xAxis: xAxis,
+  yAxis: yAxis,
+  valueYField: "value",
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{name} {valueY}"
+  })
+}));
+
+var data = getDatas('.tax');
+  // Process data
+  var processor = am5.DataProcessor.new(root, {
+    dateFields: ["date"],
+    dateFormat: "yyyy",
+    numericFields: ["value"]
+  });
+  processor.processMany(data);
+series4.data.setAll(data);
+
+// Add series
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+var series5 = chart.series.push(am5xy.LineSeries.new(root, {
+  name: "Wartung",
+  xAxis: xAxis,
+  yAxis: yAxis,
+  valueYField: "value",
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{name} {valueY}"
+  })
+}));
+
+var data = getDatas('.repair');
+  // Process data
+  var processor = am5.DataProcessor.new(root, {
+    dateFields: ["date"],
+    dateFormat: "yyyy",
+    numericFields: ["value"]
+  });
+  processor.processMany(data);
+series5.data.setAll(data);
+
+
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/
+series.appear(1000);
+chart.appear(1000, 100);
+
+}); // end am5.ready()
+</script>
+{% endblock %}
+

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+    <h2 class="title">{{ title }}</h2>
+<script src="{{ url_for('return_file_list_js') }}"></script>
+
+<div class="table-container" id="steuer">
+    <table class="table is-striped is-hoverable" >
+        <thead>
+        <tr>
+            <th class="sort" data-sort="date">Datum</th>
+            <th class="sort" data-sort="cost">Kosten</th>
+            <th class="sort" data-sort="comment">Kommentar</th>
+        </tr>
+        </thead>
+        <tbody class="list">
+        <!-- ssti template injection!!!! -->
+        {% for tax in taxes %}
+        <tr id="versicherung_{{ tax.car_tax_id }}">
+            <td hidden="hidden">{{ tax.car_tax_id }}</td>
+            <td class="date">{{ tax.date }}</td>
+            <td class="cost">{{ tax.cost }}
+            </td>
+            <td class="comment">{{ tax.description }}</td>
+            <td>
+                <a class="button" href="/steuer/{{tax.car_tax_id}}">Ändern</a>
+            </td>
+            <td><a class="button is-danger" onclick="if (confirm('Eintrag wirklich löschen?')) {fetch('{{url_for('edit_tax', tax_id=tax.car_tax_id)}}', {
+        method: 'DELETE', headers: {'X-CSRFToken': '{{ csrf_token() }}' }, redirect: 'manual'}).then(response => {window.location.href='{{url_for('steuer')}}';}  )} else {
+           return false;
+       }">Löschen</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<br>
+<script>
+var options = {
+  valueNames: [ 'date', 'cost' , 'comment' ]
+  };
+
+// Init list
+var steuerList = new List('steuer', options);
+</script>
+
+<a class="button is-success" href="{{ url_for('neue_steuer') }}">neuer Eintrag</a>
+
+{% endblock %}

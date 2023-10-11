@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+<style>
+    div#car_missing:target{display:block !important;}
+</style>
+<div class="notification is-danger" id="car_missing" style="display: none;">
+    Bitte zuerst ein Auto anlegen.
+</div>
+
+<form action="{{ url_for('new_car') }}" class="box" method="POST">
+    <h2 class="title">{{ title }}</h2>
+    <div class="field ">
+        <label class="label">Marke</label>
+        <div class="control ">
+            <input class="input" name="make" required></div>
+    </div>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="field ">
+        <label class="label">Modell</label>
+        <div class="control ">
+            <input class="input" name="model" required></div>
+    </div>
+    <div class="field ">
+        <label class="label">Baujahr</label>
+        <div class="control ">
+            <input class="input" name="year" required>
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label">Preis</label>
+        <div class="control">
+            <input class="input" min="0.01" name="buy_cost" required step=".01" type="number">
+        </div>
+    </div>
+
+    <div class="field ">
+        <label class="label">Kilometerstand</label>
+        <div class="control ">
+            <input class="input" min="0.01" name="buy_kmstand" required step=".01" type="number"></div>
+    </div>
+
+    <div class="field ">
+        <label class="label">Verbrauch kleiner als grün anzeigen</label>
+        <div class="control ">
+            <input class="input" min="0.01" name="consumption_green" required step=".01" type="number" value="5.0"></div>
+    </div>
+
+    <div class="field ">
+        <label class="label">Verbrauch größer als rot anzeigen</label>
+        <div class="control ">
+            <input class="input" min="0.01" name="consumption_red" required step=".01" type="number" value="5.5"></div>
+    </div>
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button class="button is-link" id="submit">hinzufügen</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

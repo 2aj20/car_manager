@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+
+<form action="{{ url_for('edit_tax', tax_id=tax.car_tax_id) }}" class="box" method="POST">
+    <h2 class="title">{{ title }}</h2>
+
+    <div class="field">
+        <label class="label">Datum</label>
+        <div class="control">
+            {{ tax.date }}
+        </div>
+    </div>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <input hidden="hidden" name="che_car_tax_id" value="{{ tax.car_tax_id }}">
+
+    <div class="field">
+        <label class="label">Preis</label>
+        <div class="control">
+            <input class="input" min="0.01" name="che_cost" required step=".01" type="number"
+                   value="{{ tax.cost }}">
+        </div>
+    </div>
+
+
+    <div class="field">
+        <label class="label" for="description">Kommentar:</label>
+        <div class="control">
+            <input class="input" id="description" name="che_description" value="{{tax.description}}">
+        </div>
+    </div>
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button class="button is-link" id="submit">Ändern</button>
+        </div>
+        <div class="control">
+            <a class="button is-link is-light" href="/steuer#steuer_{{ tax.car_tax_id }}">Abbrechen</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

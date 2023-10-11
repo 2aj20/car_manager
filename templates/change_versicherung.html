@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+
+<form action="{{ url_for('edit_insurance', insurance_id=insurance.car_insurance_id) }}" class="box" method="POST">
+    <h2 class="title">{{ title }}</h2>
+
+    <div class="field">
+        <label class="label">Datum</label>
+        <div class="control">
+            {{ insurance.date }}
+        </div>
+    </div>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <input hidden="hidden" name="che_car_insurance_id" value="{{ insurance.car_insurance_id }}">
+
+    <div class="field">
+        <label class="label">Preis</label>
+        <div class="control">
+            <input class="input" min="0.01" name="che_cost" required step=".01" type="number"
+                   value="{{ insurance.cost }}">
+        </div>
+    </div>
+
+
+    <div class="field">
+        <label class="label" for="description">Kommentar:</label>
+        <div class="control">
+            <input class="input" id="description" name="che_description" value="{{insurance.description}}">
+        </div>
+    </div>
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button class="button is-link" id="submit">Ändern</button>
+        </div>
+        <div class="control">
+            <a class="button is-link is-light" href="/versicherung#versicherung_{{ insurance.car_insurance_id }}">Abbrechen</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

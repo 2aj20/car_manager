@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title> {% block title%} {{ title }} {% endblock %} </title>
+    <link href="{{ url_for('return_bulma_css') }}" rel="stylesheet" type="text/css">
+    <link rel="manifest" href="{{ url_for('return_file_manifest_json') }}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="apple-mobile-web-app-title" content="Verbrauch">
+    <meta name="application-name" content="Verbrauch">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('serviceworker.js')
+    .then(registration => console.log('Service worker successfully registered for ${registration.scope}'))
+    .catch(err => console.log('Service worker registration failed: ${err}'));
+}
+</script>
+</head>
+<body>
+<script src="{{ url_for('return_file_menu_js') }}"></script>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+    <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+            <a href="{{ url_for('index') }}" class="navbar-item">
+                Übersicht
+            </a>            <a href="{{ url_for('tanken') }}" class="navbar-item">
+                Tanken
+            </a>
+            <a href="{{ url_for('grafik') }}" class="navbar-item">
+                Charts
+            </a>
+            <a href="{{ url_for('versicherung') }}" class="navbar-item">
+                Versicherung
+            </a>
+            <a href="{{ url_for('steuer') }}" class="navbar-item">
+                Steuer
+            </a>
+            <a href="{{ url_for('wartung') }}" class="navbar-item">
+                Wartung
+            </a>
+            <a href="{{ url_for('wartungsintervall') }}" class="navbar-item">
+                Wartungsintervall
+            </a>
+            <a href="{{ url_for('kostenubersicht') }}" class="navbar-item">
+                Kostenübersicht
+            </a>
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">
+                    Mehr
+                </a>
+                <div class="navbar-dropdown">
+                    <a href="{{ url_for('select_car') }}" class="navbar-item">
+                        anderes Auto auswählen
+                    </a>
+                    <a href="{{ url_for('change_car') }}" class="navbar-item">
+                        Auto bearbeiten
+                    </a>
+                </div>
+            </div>
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a href="{{ url_for('logout') }}" class="button is-light">
+                            <strong>Abmelden</strong>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    {% block content%}
+    {% endblock %}
+</div>
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+
+<form action="{{ url_for('neuer_fillup') }}" class="box" method="POST">
+    <h2 class="title">{{ title }}</h2>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="field">
+        <label class="label" for="date">Datum:</label>
+        <div class="control">
+            <input class="input" id="date" name="date" required type="date"></div>
+    </div>
+
+    <div class="field">
+        <label class="label" for="gallons">getankte Liter:</label>
+        <div class="control">
+            <input class="input" id="gallons" min="0.01" name="gallons" required step=".01" type="number"></div>
+    </div>
+
+    <div class="field">
+        <label class="label" for="total_cost">Kosten:</label>
+        <div class="control">
+            <input class="input" id="total_cost" min="0.01" name="total_cost" required step=".01" type="number"></div>
+    </div>
+
+    <div class="field">
+        <label class="label" for="drived_meters">gefahrene Kilometer:</label>
+        <div class="control">
+            <input class="input" id="drived_meters" min="0.01" name="drived_meters" required step=".01" type="number">
+        </div>
+    </div>
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button class="button is-link" id="submit">Hinzufügen</button>
+        </div>
+        <div class="control">
+            <a class="button is-link is-light" href="{{ url_for('tanken') }}">Abbrechen</a>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

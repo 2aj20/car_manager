@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+
+<script src="{{ url_for('return_file_list_js') }}"></script>
+    <h2 class="title">Letzte 5 Einträge</h2>
+
+<div class="table-container" id="fillups">
+    <table class="table is-striped is-hoverable">
+        <thead>
+        <tr>
+            <th hidden="hidden" class="sortable">ID</th>
+            <th class="sort" data-sort="date">Datum</th>
+            <th class="sort" data-sort="gallons">Liter</th>
+            <th class="sort" data-sort="total_cost">Preis</th>
+            <th class="sort" data-sort="drived_meters">Gef. Km</th>
+            <th class="sort" data-sort="price_per_gallon">€/l</th>
+            <th class="sort" data-sort="price_per_100km">€/100km</th>
+            <th class="sort" data-sort="consumption_per_100km">Verbrauch pro 100km</th>
+        </tr>
+        </thead>
+        <tbody class="list">
+        <!-- ssti template injection!!!! -->
+        {% for fill_up in fill_ups %}
+        <tr id="tankeintrag_{{ fill_up.fill_up_id }}">
+            <td hidden="hidden">{{ fill_up.fill_up_id }}</td>
+            <td class="date">{{ fill_up.date }}</td>
+            <td class="gallons">{{ fill_up.gallons }}</td>
+            <td class="total_cost">{{ fill_up.total_cost }}</td>
+            <td class="drived_meters">{{ fill_up.drived_meters }}</td>
+            <td class="price_per_gallon">{{ fill_up.price_per_gallon }}</td>
+            <td class="price_per_100km">{{ fill_up.price_per_100km }}</td>
+            <td class="consumption_per_100km">{{ fill_up.consumption_per_100km }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+var options = {
+  valueNames: [ 'date', 'gallons', 'total_cost', 'drived_meters', 'price_per_gallon', 'price_per_100km', 'consumption_per_100km' ]
+};
+
+// Init list
+var fillupList = new List('fillups', options);
+
+</script>
+
+<script>
+    document.querySelectorAll('.consumption_per_100km').forEach(function(elem) {
+    // Now do something with my button
+	if (elem.textContent<{{ consumption_green }}){
+elem.classList.add("has-text-success")}
+else if (elem.textContent>{{ consumption_red }}){
+elem.classList.add("has-text-danger")}
+});
+</script>
+
+
+<form action="{{ url_for('neuer_fillup') }}" class="box" method="POST">
+    <h2 class="title">Eintrag hinzufügen</h2>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="field">
+        <label class="label" for="date">Datum:</label>
+        <div class="control">
+            <input class="input" id="date" name="date" required type="date"></div>
+    </div>
+
+    <div class="field">
+        <label class="label" for="gallons">getankte Liter:</label>
+        <div class="control">
+            <input class="input" id="gallons" min="0.01" name="gallons" required step=".01" type="number"></div>
+    </div>
+
+    <div class="field">
+        <label class="label" for="total_cost">Kosten:</label>
+        <div class="control">
+            <input class="input" id="total_cost" min="0.01" name="total_cost" required step=".01" type="number"></div>
+    </div>
+
+    <div class="field">
+        <label class="label" for="drived_meters">gefahrene Kilometer:</label>
+        <div class="control">
+            <input class="input" id="drived_meters" min="0.01" name="drived_meters" required step=".01" type="number">
+        </div>
+    </div>
+
+    <input hidden="hidden" id="next_redirect" name="next_redirect" value="{{ url_for('index') }}">
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button class="button is-link" id="submit">Hinzufügen</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

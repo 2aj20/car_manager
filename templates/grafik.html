@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+    <!-- Styles amcharts -->
+    <style>
+    #chartdiv, #chartdivVerbrauch {
+        width: 100%;
+        height: 500px;
+        max-width: 100%
+    }
+    </style>
+    <h2 class="title">{{ title }}</h2>
+
+<a class="button" href="{{ url_for('grafik') }}">alle</a>
+{% for year in available_years %}
+<a class="button" href="{{ url_for('grafik', selected_year=year) }}">{{year}}</a>
+{% endfor %}
+
+
+<!-- Resources -->
+<script src="{{ url_for('return_files_amcharts_index_js') }}"></script>
+<script src="{{ url_for('return_files_amcharts_xy_js') }}"></script>
+<script src="{{ url_for('return_files_amcharts_animated_js') }}"></script>
+
+<!-- Chart code -->
+<script>
+am5.ready(function() {
+
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+var root = am5.Root.new("chartdiv");
+
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
+root.setThemes([
+  am5themes_Animated.new(root)
+]);
+
+// Create chart
+// https://www.amcharts.com/docs/v5/charts/xy-chart/
+var chart = root.container.children.push(am5xy.XYChart.new(root, {
+  panX: true,
+  panY: true,
+  wheelX: "panX",
+  wheelY: "zoomX",
+  pinchZoomX:true
+}));
+
+// Add cursor
+// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+  behavior: "none"
+}));
+cursor.lineY.set("visible", false);
+
+// Create axes
+// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+  maxDeviation: 0.2,
+  baseInterval: {
+    timeUnit: "day",
+    count: 1
+  },
+  renderer: am5xy.AxisRendererX.new(root, {}),
+  tooltip: am5.Tooltip.new(root, {})
+}));
+
+var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+  renderer: am5xy.AxisRendererY.new(root, {})
+}));
+
+// Add series
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+var series = chart.series.push(am5xy.LineSeries.new(root, {
+  name: "Series",
+  xAxis: xAxis,
+  yAxis: yAxis,
+  valueYField: "value",
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueY}"
+  })
+}));
+
+// Add scrollbar
+// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+chart.set("scrollbarX", am5.Scrollbar.new(root, {
+  orientation: "horizontal"
+}));
+
+//am5.net.load("/chart/sprit{% if selected_year %}?year={{selected_year}}{% endif %}").then(function(result) {
+am5.net.load("{{ url_for('chart', type_data='sprit') }}{% if selected_year %}?year={{selected_year}}{% endif %}").then(function(result) {
+    // Parse data
+  var data = am5.JSONParser.parse(result.response);
+
+  // Process data
+  var processor = am5.DataProcessor.new(root, {
+    dateFields: ["date"],
+    dateFormat: "yyyy-MM-dd",
+    numericFields: ["value"]
+  });
+  processor.processMany(data);
+
+  // Use parsed/processed data
+  series.data.setAll(data);
+});
+
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/
+series.appear(1000);
+chart.appear(1000, 100);
+
+}); // end am5.ready()
+</script>
+<br>
+<h3 class="title is-3">Spritpreis</h3>
+<!-- HTML -->
+<div id="chartdiv"></div>
+
+
+<!-- Chart code -->
+<script>
+am5.ready(function() {
+
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+var root = am5.Root.new("chartdivVerbrauch");
+
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
+root.setThemes([
+  am5themes_Animated.new(root)
+]);
+
+// Create chart
+// https://www.amcharts.com/docs/v5/charts/xy-chart/
+var chart = root.container.children.push(am5xy.XYChart.new(root, {
+  panX: true,
+  panY: true,
+  wheelX: "panX",
+  wheelY: "zoomX",
+  pinchZoomX:true
+}));
+
+// Add cursor
+// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+  behavior: "none"
+}));
+cursor.lineY.set("visible", false);
+
+// Create axes
+// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+  maxDeviation: 0.2,
+  baseInterval: {
+    timeUnit: "day",
+    count: 1
+  },
+  renderer: am5xy.AxisRendererX.new(root, {}),
+  tooltip: am5.Tooltip.new(root, {})
+}));
+
+var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+  renderer: am5xy.AxisRendererY.new(root, {})
+}));
+
+// Add series
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+var series = chart.series.push(am5xy.LineSeries.new(root, {
+  name: "Series",
+  xAxis: xAxis,
+  yAxis: yAxis,
+  valueYField: "value",
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueY}"
+  })
+}));
+
+// Add scrollbar
+// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+chart.set("scrollbarX", am5.Scrollbar.new(root, {
+  orientation: "horizontal"
+}));
+
+//am5.net.load("/chart/verbrauch{% if selected_year %}?year={{selected_year}}{% endif %}").then(function(result) {
+am5.net.load("{{ url_for('chart', type_data='verbrauch') }}{% if selected_year %}?year={{selected_year}}{% endif %}").then(function(result) {
+    // Parse data
+  var data = am5.JSONParser.parse(result.response);
+
+  // Process data
+  var processor = am5.DataProcessor.new(root, {
+    dateFields: ["date"],
+    dateFormat: "yyyy-MM-dd",
+    numericFields: ["value"]
+  });
+  processor.processMany(data);
+
+  // Use parsed/processed data
+  series.data.setAll(data);
+});
+
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/
+series.appear(1000);
+chart.appear(1000, 100);
+
+}); // end am5.ready()
+</script>
+<br>
+<h3 class="title is-3">Verbrauch</h3>
+<!-- HTML -->
+<div id="chartdivVerbrauch"></div>
+{% endblock %}

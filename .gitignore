@@ -1,0 +1,7 @@
+.idea/
+__pycache__/
+.env
+venv
+httpdocs/bulma
+list.min.js
+amcharts5

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+
+<script>
+window.addEventListener("load", function () {
+    document.getElementById("submitForm").addEventListener("click", submitForm);
+
+    let elementsArray = document.querySelectorAll(".input");
+    elementsArray.forEach(function(elem) {
+    elem.onkeydown = function(e){
+   if(e.keyCode == 13){
+     submitForm();
+   }
+};
+        elem.addEventListener("input", function() {
+            resetSuccessMessage();
+        });
+    });
+});
+
+function resetSuccessMessage() {
+
+    document.getElementById("message").textContent = '';
+        let elementsArray = document.querySelectorAll(".input");
+    elementsArray.forEach(function(elem) {
+        elem.classList.remove("is-success");
+    });
+}
+function submitForm() {
+    if (document.getElementById("change_auto").reportValidity()) {
+        document.getElementById("submitForm").classList.add("is-loading");
+        resetSuccessMessage();
+        var data = new FormData(document.getElementById("change_auto"));
+
+     fetch("{{ url_for('change_car') }}", {
+            method: "POST",
+            body: data
+        })
+             .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                alert("Verbindungsproblem :( Fehler");
+                throw new Error("Network response was not ok.");
+            }
+        })
+        .then(data => {
+            if (data.status === "1") {
+                document.getElementById("message").textContent = "Auto wurde geändert.";
+                document.getElementById("message").className = "help is-success is-size-4";
+                document.getElementById("submitForm").classList.remove("is-loading");
+                       let elementsArray = document.querySelectorAll(".input");
+                    elementsArray.forEach(function(elem) {
+                        elem.classList.add("is-success");
+                    });
+
+            }
+        })
+        .catch(error => {
+            alert("Fehler mit Verbindung :(");
+            //console.error("Error:", error);
+        });
+    }
+}
+</script>
+
+<form id="change_auto" class="box">
+    <noscript>
+        <p class="is-size-4 help is-danger">Um die Anwendung zu verwenden, muss JavaScript im Browser aktiviert
+            sein.</p>
+    </noscript>
+    <h2 class="title">{{ title }}</h2>
+    <div class="field ">
+        <label class="label">Marke</label>
+        <div class="control ">
+            <input class="input" name="che_make" required
+                   value="{{ car.make }}"></div>
+    </div>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="field ">
+        <label class="label">Modell</label>
+        <div class="control ">
+            <input class="input" name="che_model" required
+                   value="{{ car.model }}"></div>
+    </div>
+    <div class="field ">
+        <label class="label">Baujahr</label>
+        <div class="control ">
+            <input class="input" name="che_year" required value="{{ car.year }}">
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label">Preis</label>
+        <div class="control">
+            <input class="input" min="0.01" name="che_buy_cost" required step=".01" type="number"
+                   value="{{ car.buy_cost }}">
+        </div>
+    </div>
+
+    <div class="field ">
+        <label class="label">Kilometerstand (beim Kauf)</label>
+        <div class="control ">
+            <input class="input" min="0.01" name="che_buy_kmstand" required step=".01" type="number"
+                   value="{{ car.buy_kmstand }}"></div>
+    </div>
+
+   <div class="field ">
+        <label class="label">Verbrauch kleiner als grün anzeigen</label>
+        <div class="control ">
+            <input class="input" min="0.01" name="consumption_green" required step=".01" type="number" value="{{ car.consumption_green }}"></div>
+    </div>
+
+    <div class="field ">
+        <label class="label">Verbrauch größer als rot anzeigen</label>
+        <div class="control ">
+            <input class="input" min="0.01" name="consumption_red" required step=".01" type="number" value="{{ car.consumption_red }}"></div>
+    </div>
+
+
+    <div class="field is-grouped">
+        <div class="control">
+                            <button class="button is-link" id="submitForm" type="button">Ändern</button>
+        </div>
+        <div class="control">
+            <a class="button is-link is-light" href="{{ url_for('kostenubersicht') }}">Abbrechen</a>
+        </div>
+            <div id="message"></div>
+
+    </div>
+</form>
+{% endblock %}

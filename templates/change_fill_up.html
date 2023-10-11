@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+
+<form action="{{ url_for('edit_fillup', fillup_id=fill_up.fill_up_id) }}" class="box" method="POST">
+    <h2 class="title">{{ title }}</h2>
+
+    <div class="field">
+        <label class="label">Datum</label>
+        <div class="control">
+            {{ fill_up.date }}
+        </div>
+    </div>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <input hidden="hidden" name="che_fill_up_id" value="{{ fill_up.fill_up_id }}">
+
+    <div class="field">
+        <label class="label">Liter</label>
+        <div class="control">
+            <input class="input" min="0.01" name="che_gallons" required step=".01" type="number"
+                   value="{{ fill_up.gallons }}">
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label">Preis</label>
+        <div class="control">
+            <input class="input" min="0.01" name="che_total_cost" required step=".01" type="number"
+                   value="{{ fill_up.total_cost }}">
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label">Gef. Km</label>
+        <div class="control">
+            <input class="input" min="0.01" name="che_drived_meters" required step=".01" type="number"
+                   value="{{ fill_up.drived_meters }}">
+        </div>
+    </div>
+
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button class="button is-link" id="submit">Ändern</button>
+        </div>
+        <div class="control">
+            <a class="button is-link is-light" href="{{url_for('tanken')}}#tankeintrag_{{fill_up.fill_up_id}}">Abbrechen</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

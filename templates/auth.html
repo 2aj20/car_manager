@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <link href="/bulma/css/bulma.min.css" rel="stylesheet" type="text/css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="apple-mobile-web-app-title" content="Verbrauch">
+    <meta name="application-name" content="Verbrauch">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+<div class="container">
+    <form method="POST" class="box">
+        <h1 class="title">{{ title }}</h1>
+
+        {{ form.csrf_token }}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <article class="message is-{{category}}">
+            <div class="message-body">
+                {{ message }}
+            </div>
+        </article>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <div class="field">
+            <label class="label">Benutzername</label>
+            <div class="control">
+                {% if form.user_name.errors %}
+                {{ form.user_name(class_="input is-warning",placeholder="Benutzername")}}
+                {% else %}
+                {{ form.user_name(class_="input",placeholder="Benutzername")}}
+                {% endif %}
+            </div>
+            {% for error in form.user_name.errors %}
+            <article class="message is-warning">
+                <div class="message-body"> {{ error }}
+                </div>
+            </article>
+            {% endfor%}
+        </div>
+
+        <div class="field">
+            <label class="label">Passwort</label>
+            <div class="control">
+                {% if form.password.errors %}
+                {{ form.password(class_="input is-warning",placeholder="Passwort")}}
+                {% else %}
+                {{ form.password(class_="input",placeholder="Passwort")}}
+                {% endif %}
+            </div>
+            {% for error in form.password.errors %}
+            <article class="message is-warning">
+                <div class="message-body">
+                    {{ error }}
+                </div>
+            </article>
+            {% endfor%}
+        </div>
+
+
+        {% if next_redirect %}
+        <input hidden='hidden' name="next_redirect" value="{{next_redirect}}">
+        {% endif %}
+
+        <div class="field is-grouped">
+            <div class="control">
+                <button type="submit" class="button is-link"> {{ btn_action }}</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

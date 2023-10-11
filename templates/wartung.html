@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+
+
+    <h2 class="title">{{ title }}</h2>
+<script src="{{ url_for('return_file_list_js') }}"></script>
+
+<div class="table-container" id="wartunglist">
+    <table class="table is-striped is-hoverable" id="wartung">
+        <thead>
+        <tr>
+            <th class="sort" data-sort="date">Datum</th>
+            <th class="sort" data-sort="cost">Kosten</th>
+            <th class="sort" data-sort="kmstand">km-Stand</th>
+            <th class="sort" data-sort="firma">Firma</th>
+            <th class="sort" data-sort="comment">Arbeiten</th>
+        </tr>
+        </thead>
+        <tbody class="list">
+        <!-- ssti template injection!!!! -->
+        {% for repair in repaires %}
+        <tr id="wartung_{{ repair.car_repair_id }}">
+            <td hidden="hidden">{{ repair.car_repair_id }}</td>
+            <td class="date">{{ repair.date }}</td>
+            <td class="cost">{{ repair.cost }}
+            </td>
+            <td class="kmstand">{{ repair.kmstand }}
+            </td>
+            <td class="firma">{{ repair.firma }}</td>
+            <td class="comment">{{ repair.description }}</td>
+            <td>
+                <a class="button" href="/wartung/{{repair.car_repair_id}}">Ändern</a>
+            </td>
+            <td><a class="button is-danger" onclick="if (confirm('Eintrag wirklich löschen?')) {fetch('{{url_for('edit_repair', repair_id=repair.car_repair_id)}}', {
+        method: 'DELETE', headers: {'X-CSRFToken': '{{ csrf_token() }}' }, redirect: 'manual'}).then(response => {window.location.href='{{url_for('wartung')}}';}  )} else {
+           return false;
+       }">Löschen</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+var options = {
+  valueNames: [ 'date', 'cost', 'kmstand', 'firma', 'comment' ]
+  };
+
+// Init list
+var wartungList = new List('wartunglist', options);
+</script>
+
+<br>
+
+<a class="button is-success" href="{{ url_for('neue_wartung') }}">neuer Eintrag</a>
+{% endblock %}

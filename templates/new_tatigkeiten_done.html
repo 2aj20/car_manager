@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+<div class="container">
+    <form method="POST" class="box">
+        <h2 class="title">{{ title }}</h2>
+
+        {{ form.csrf_token }}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <article class="message is-{{category}}">
+            <div class="message-body">
+                {{ message|safe }}
+            </div>
+        </article>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <div class="field">
+            <label class="label">Arbeit:</label>
+            <div class="control">
+                {{ car_repair_exist.name }}
+                <div  hidden="hidden">
+                    {{ form.car_repair_exist_id(class_="input")}}
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Notiz</label>
+            <div class="control">
+                {% if form.description.errors %}
+                {{ form.description(class_="input is-warning")}}
+                {% else %}
+                {{ form.description(class_="input")}}
+                {% endif %}
+            </div>
+            {% for error in form.description.errors %}
+            <article class="message is-warning">
+                <div class="message-body"> {{ error }}
+                </div>
+            </article>
+            {% endfor%}
+        </div>
+        <div class="field">
+            <label class="label">Start Datum</label>
+            <div class="control">
+                {% if form.begin_date.errors %}
+                {{ form.begin_date(class_="input is-warning")}}
+                {% else %}
+                {{ form.begin_date(class_="input")}}
+                {% endif %}
+            </div>
+            {% for error in form.begin_date.errors %}
+            <article class="message is-warning">
+                <div class="message-body"> {{ error }}
+                </div>
+            </article>
+            {% endfor%}
+        </div>
+        <div class="field">
+            <label class="label">Start kmstand</label>
+            <div class="control">
+                {% if form.begin_kmstand.errors %}
+                {{ form.begin_kmstand(class_="input is-warning")}}
+                {% else %}
+                {{ form.begin_kmstand(class_="input")}}
+                {% endif %}
+            </div>
+            {% for error in form.begin_kmstand.errors %}
+            <article class="message is-warning">
+                <div class="message-body"> {{ error }}
+                </div>
+            </article>
+            {% endfor%}
+        </div>
+        <div class="field">
+            <label class="label">Ende Datum</label>
+            <div class="control">
+                {% if form.end_date.errors %}
+                {{ form.end_date(class_="input is-warning")}}
+                {% else %}
+                {{ form.end_date(class_="input")}}
+                {% endif %}
+            </div>
+            {% for error in form.end_date.errors %}
+            <article class="message is-warning">
+                <div class="message-body"> {{ error }}
+                </div>
+            </article>
+            {% endfor%}
+        </div>
+        <div class="field">
+            <label class="label">Ende kmstand</label>
+            <div class="control">
+                {% if form.end_kmstand.errors %}
+                {{ form.end_kmstand(class_="input is-warning")}}
+                {% else %}
+                {{ form.end_kmstand(class_="input")}}
+                {% endif %}
+            </div>
+            {% for error in form.end_kmstand.errors %}
+            <article class="message is-warning">
+                <div class="message-body"> {{ error }}
+                </div>
+            </article>
+            {% endfor%}
+        </div>
+
+
+        <div class="field is-grouped">
+            <div class="control">
+                <button type="submit" class="button is-link"> {{ btn_action }}</button>
+            </div>
+            <div class="control">
+                <a class="button is-link is-light"
+                   href="{{ url_for('wartungsintervall') }}">Abbrechen</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

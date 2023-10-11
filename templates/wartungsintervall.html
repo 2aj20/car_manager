@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+
+
+<h2 class="title">{{ title }}</h2>
+<script src="{{ url_for('return_file_list_js') }}"></script>
+
+{% for repair in repaires_exists %}
+<a class="button" href="#arbeit_{{ repair.car_repair_exist_id }}">{{ repair.name }}</a>
+{% endfor %}
+
+
+{% for repair in repaires_exists %}
+
+<h4 class="title is-4" id="arbeit_{{ repair.car_repair_exist_id }}">{{ repair.name }} {% if repair.intervall %}({{ repair.intervall }}){% endif %}</h4>
+
+<a class="button"
+   href="{{ url_for('edit_repaires_exists', car_repair_exist_id=repair.car_repair_exist_id) }}">Ändern</a>
+<a class="button is-danger" onclick="if (confirm('Eintrag wirklich löschen?')) { fetch('{{url_for('edit_repaires_exists', car_repair_exist_id=repair.car_repair_exist_id)}}', {
+        method: 'DELETE', headers: {'X-CSRFToken': '{{ csrf_token() }}' }, redirect: 'manual'}).then(response => {window.location.href='{{url_for('wartungsintervall')}}';}  )} else {
+           return false;
+       }">Löschen</a>
+
+<div class="table-container" id="list_arbeit_{{ repair.car_repair_exist_id }}">
+    <table class="table is-striped is-hoverable" id="wartung2">
+        <thead>
+        <tr>
+            <th class="sort" data-sort="startdate">Start Datum</th>
+            <th class="sort" data-sort="begin_kmstand">Start km-Stand</th>
+            <th class="sort" data-sort="enddate">Ende Datum</th>
+            <th class="sort" data-sort="end_kmstand">Ende km-Stand</th>
+            <th class="sort" data-sort="laufzeit">Laufleistung</th>
+            <th class="sort" data-sort="description">Kommentar</th>
+        </tr>
+        </thead>
+        <tbody class="list">
+        <!-- ssti template injection!!!! -->
+        {% for repair_done in repair.repaires_dones %}
+        <tr id="done_arbeit_{{ repair_done.car_repair_done_id }}">
+            <td class="startdate">{{ repair_done.begin_date }}
+            </td>
+            <td class="begin_kmstand">{{ repair_done.begin_kmstand }}
+            </td>
+            <td class="enddate">{% if repair_done.end_date %}{{ repair_done.end_date }}{% endif %}</td>
+            <td class="end_kmstand">{% if repair_done.end_kmstand %}{{ repair_done.end_kmstand }}{% endif %}</td>
+            <td class="laufzeit">{{ repair_done.laufzeit }}</td>
+            <td class="description">{{ repair_done.description }}</td>
+            <td>
+                <a class="button"
+                   href="{{url_for('edit_repaires_done', car_repair_done_id=repair_done.car_repair_done_id)}}">Ändern</a>
+            </td>
+            <td>
+                <a class="button is-danger" onclick="if (confirm('Eintrag wirklich löschen?')) {fetch('{{url_for('edit_repaires_done', car_repair_done_id=repair_done.car_repair_done_id)}}', {
+        method: 'DELETE', headers: {'X-CSRFToken': '{{ csrf_token() }}' }, redirect: 'manual'}).then(response => {window.location.href='{{url_for('wartungsintervall')}}';}  )} else {
+           return false;
+       }">Löschen</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a class="button"
+                   href="{{ url_for('neue_repaires_done', car_repair_exist_id=repair.car_repair_exist_id) }}">{{ repair.name }} neu
+                hinzufügen</a>
+</div>
+<script>
+var options = {
+  valueNames: [ 'description', 'startdate', 'begin_kmstand', 'enddate', 'end_kmstand', 'laufzeit' ]
+  };
+
+// Init list
+var listArbeit_{{ repair.car_repair_exist_id }} = new List('list_arbeit_{{ repair.car_repair_exist_id }}', options);
+</script>
+
+<hr>
+{% endfor %}
+
+
+<br>
+
+<a class="button is-success" href="{{ url_for('neue_repaires_exists') }}">neue Wartungsart Eintrag</a>
+{% endblock %}

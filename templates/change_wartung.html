@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title%} {{ title }} {% endblock %}
+
+{% block content%}
+
+<form action="{{ url_for('edit_repair', repair_id=repair.car_repair_id) }}" class="box" method="POST">
+    <h2 class="title">{{ title }}</h2>
+
+    <div class="field">
+        <label class="label">Datum</label>
+        <div class="control">
+            {{ repair.date }}
+        </div>
+    </div>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <input hidden="hidden" name="che_car_repair_id" value="{{ repair.car_repair_id }}">
+
+    <div class="field">
+        <label class="label" for="kmstand">km-Stand:</label>
+        <div class="control">
+            <input class="input" id="kmstand" min="0.01" name="che_kmstand" required step=".01" type="number"
+                   value="{{ repair.kmstand }}"></div>
+    </div>
+
+    <div class="field">
+        <label class="label" for="cost">Kosten:</label>
+        <div class="control">
+            <input class="input" id="cost" min="0.00" name="che_cost" required step=".01" type="number"
+                   value="{{ repair.cost }}"></div>
+    </div>
+
+    <div class="field">
+        <label class="label" for="description">Firma:</label>
+        <div class="control">
+            <input class="input" id="firma" name="che_firma" value="{{repair.firma}}">
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label" for="description">Arbeiten:</label>
+        <div class="control">
+            <input class="input" id="description" name="che_description" value="{{repair.description}}">
+        </div>
+    </div>
+
+    <div class="field is-grouped">
+        <div class="control">
+            <button class="button is-link" id="submit">Ändern</button>
+        </div>
+        <div class="control">
+            <a class="button is-link is-light" href="/wartung#wartung_{{ repair.car_repair_id }}">Abbrechen</a>
+        </div>
+    </div>
+</form>
+{% endblock %}
