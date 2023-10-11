@@ -4,6 +4,13 @@ I published it here, maybe someone find it useful.
 
 I wrote a flask app to manage a car with its costs with some statistics (fillups, taxes, insurance, repairs, multiple users and cars).
 
+Screenshots
+![Übersicht.png](assets%2F%C3%9Cbersicht.png)
+![Grafiken.png](assets%2FGrafiken.png)
+![Kostenübersicht.png](assets%2FKosten%C3%BCbersicht.png)
+![Tanken.png](assets%2FTanken.png)
+![Wartungsintervall.png](assets%2FWartungsintervall.png)
+
 ### install requirements
 ```
 python3 -m venv venv
