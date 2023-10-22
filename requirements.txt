@@ -1,4 +1,4 @@
-sqlalchemy==2.0.21
+sqlalchemy==2.0.22
 flask==3.0.0
 Flask-Login==0.6.2
 bcrypt==4.0.1
