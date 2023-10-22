@@ -9,7 +9,7 @@
     <div class="field">
         <label class="label">Datum</label>
         <div class="control">
-            {{ insurance.date }}
+            {{ insurance.date.strftime('%d.%m.%Y') }}
         </div>
     </div>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -20,7 +20,7 @@
         <label class="label">Preis</label>
         <div class="control">
             <input class="input" min="0.01" name="che_cost" required step=".01" type="number"
-                   value="{{ insurance.cost }}">
+                   value="{{ insurance.cost | format_number }}">
         </div>
     </div>
 

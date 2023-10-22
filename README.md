@@ -33,9 +33,10 @@ cp example.env .env
 sed -i "s/REPLACE_SECRET_KEY/$(openssl rand -base64 30)/" .env
 sed -i "s/REPLACE_WTF_CSRF_SECRET_KEY/$(openssl rand -base64 30)/" .env
 
-sed -i "s/replace_user1/YOUR_USERNAME/" app.py
-BCRYPT_PASSWORD_HASH=$(python3 -c 'import bcrypt; print(bcrypt.hashpw(b"YOUR_SECRET_PASSWORD", bcrypt.gensalt()).decode("utf-8"))')
-sed -i "s/replace_password1/$BCRYPT_PASSWORD_HASH/" app.py
+# default admin user in sqlite fuel.db admin:admin123
+python3 -c 'import bcrypt; print(bcrypt.hashpw(b"YOUR_SECRET_PASSWORD", bcrypt.gensalt()).decode("utf-8"))'
+# then edit sqlite and change password_hash
+# at /user you can create new users
 ```
 
 ### download used libs
@@ -53,7 +54,8 @@ unzip bulma-0.9.4.zip -d httpdocs
 ### start
 ```
 # local run with sqlite
-# in the existing fuel.db are some dummy data for the user with name "YOUR_USERNAME"
+# in the existing fuel.db are some dummy data for the user admin:admin123
+# at /user you can create new users
 flask run --debug --no-debugger
 ```
 

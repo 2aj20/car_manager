@@ -25,13 +25,13 @@
         {% for fill_up in fill_ups %}
         <tr id="tankeintrag_{{ fill_up.fill_up_id }}">
             <td hidden="hidden">{{ fill_up.fill_up_id }}</td>
-            <td class="date">{{ fill_up.date }}</td>
-            <td class="gallons">{{ fill_up.gallons }}</td>
-            <td class="total_cost">{{ fill_up.total_cost }}</td>
-            <td class="drived_meters">{{ fill_up.drived_meters }}</td>
-            <td class="price_per_gallon">{{ fill_up.price_per_gallon }}</td>
-            <td class="price_per_100km">{{ fill_up.price_per_100km }}</td>
-            <td class="consumption_per_100km">{{ fill_up.consumption_per_100km }}</td>
+            <td class="date" date-timestamp="{{ fill_up.date }}">{{ fill_up.date.strftime('%d.%m.%Y') }}</td>
+            <td class="gallons">{{ fill_up.gallons | format_number }}</td>
+            <td class="total_cost">{{ fill_up.total_cost | format_number }}</td>
+            <td class="drived_meters">{{ fill_up.drived_meters | format_number }}</td>
+            <td class="price_per_gallon">{{ fill_up.price_per_gallon | format_number }}</td>
+            <td class="price_per_100km">{{ fill_up.price_per_100km | format_number }}</td>
+            <td class="consumption_per_100km">{{ fill_up.consumption_per_100km | format_number }}</td>
         </tr>
         {% endfor %}
         </tbody>
@@ -39,7 +39,7 @@
 </div>
 <script>
 var options = {
-  valueNames: [ 'date', 'gallons', 'total_cost', 'drived_meters', 'price_per_gallon', 'price_per_100km', 'consumption_per_100km' ]
+  valueNames: [ { name: 'date', attr: 'date-timestamp' }, 'gallons', 'total_cost', 'drived_meters', 'price_per_gallon', 'price_per_100km', 'consumption_per_100km' ]
 };
 
 // Init list
@@ -50,9 +50,10 @@ var fillupList = new List('fillups', options);
 <script>
     document.querySelectorAll('.consumption_per_100km').forEach(function(elem) {
     // Now do something with my button
-	if (elem.textContent<{{ consumption_green }}){
+    consumption = elem.textContent.replace(/,/, '.')
+	if (consumption<{{ consumption_green }}){
 elem.classList.add("has-text-success")}
-else if (elem.textContent>{{ consumption_red }}){
+else if (consumption>{{ consumption_red }}){
 elem.classList.add("has-text-danger")}
 });
 </script>

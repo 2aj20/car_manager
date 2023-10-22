@@ -6,9 +6,9 @@ from statistics import mean, median
 import flask_login
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, send_file, url_for, make_response, jsonify, flash
-from flask_bcrypt import check_password_hash
+from flask_bcrypt import check_password_hash, generate_password_hash
 from flask_wtf import FlaskForm
-from sqlalchemy import create_engine, Column, Integer, ForeignKey, Numeric, Date, extract, Text
+from sqlalchemy import create_engine, Column, Integer, ForeignKey, Numeric, Date, extract, Text, VARCHAR, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
@@ -23,7 +23,7 @@ app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
 app.config["REMEMBER_COOKIE_SAMESITE"] = "Strict"
 app.config["WTF_CSRF_SECRET_KEY"] = os.getenv('WTF_CSRF_SECRET_KEY')
 login_manager = flask_login.LoginManager()
-login_manager.session_protection = "strong"
+# login_manager.session_protection = "strong" # disabled otherwise remember does not work https://stackoverflow.com/questions/39938199/flask-login-remember-me-not-working-if-login-managers-session-protection-is-se/41873554#41873554
 login_manager.init_app(app)
 
 from flask_wtf.csrf import CSRFProtect
@@ -41,6 +41,11 @@ else:
 
 
 Base = declarative_base()
+
+
+@app.template_filter()
+def format_number(value):
+    return str(value).replace('.', ',')
 
 
 class Car(Base):
@@ -129,42 +134,43 @@ class RepairDone(Base):
     car = relationship('Car', back_populates='repair_done')
 
 
+class User(flask_login.UserMixin, Base):
+    __tablename__ = 'User'
+    id = Column(Integer, primary_key=True)
+    user_name = Column(VARCHAR(50), unique=True, nullable=False)
+    password_hash = Column(Text, nullable=False)
+    admin = Column(Boolean)
+    cars = relationship('UserCar', back_populates='users')
+
+
 class UserCar(Base):
     __tablename__ = 'UserCar'
     user_car_id = Column(Integer, primary_key=True)
     car_id = Column(Integer, ForeignKey('Car.car_id'))
-    name = Column(Text)
+    user_id = Column(Integer, ForeignKey('User.id'))
     car = relationship('Car', back_populates='users')
+    users = relationship('User', back_populates='cars')
 
 
 Base.metadata.create_all(engine)  # Create the database tables
 
 
-class User(flask_login.UserMixin):
-    pass
-
-
-users = {'replace_user1': {'password': 'replace_password1'}}
-
-
 @login_manager.user_loader
-def user_loader(user_name):
-    if user_name not in users:
-        return
-
-    user = User()
-    user.id = user_name
+def user_loader(id):
+    # Load the user from the database by user_id
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    user = session.query(User).filter_by(id=id).first()
     return user
 
 
 @login_manager.request_loader
 def request_loader(request):
     user_name = request.form.get('user_name')
-    if user_name not in users:
-        return
-
-    user = User()
-    user.id = user_name
+    # Load the user from the database by user_name
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    user = session.query(User).filter_by(user_name=user_name).first()
     return user
 
 
@@ -194,14 +200,18 @@ def login():
         try:
             user_name = form.user_name.data
             entered_password = form.password.data
-            if user_name in users and check_password_hash(users[user_name]['password'], entered_password):
-                user = User()
-                user.id = user_name
-                flask_login.login_user(user=user, remember=True, duration=datetime.timedelta(weeks=4))
+            Session = sessionmaker(bind=engine)
+            session = Session()
 
+            user = session.query(User).filter(User.user_name == user_name).first()
+
+            if user and check_password_hash(user.password_hash, entered_password):
+                flask_login.login_user(user=user, remember=True, duration=datetime.timedelta(weeks=4))
+                session.close()
                 next_redirect = redirect_to(request.args.get('next_redirect'))
                 return redirect(next_redirect)
 
+            session.close()
             flash("Login fehlgeschlagen!", "danger")
         except Exception as e:
             # flash(e, "danger") # dont expose error messages
@@ -270,10 +280,10 @@ def valid_car(car_id) -> bool:
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    car = session.query(Car).join(UserCar).filter_by(name=flask_login.current_user.id).filter(
-        Car.car_id == car_id).first()
+    user_car = session.query(UserCar).filter_by(user_id=flask_login.current_user.id).filter_by(car_id=car_id).first()
+   # car = session.query(Car).join(UserCar).filter_by(user_id=flask_login.current_user.id).filter( Car.car_id == car_id).first()
     # car = session.query(Car).filter(Car.car_id == car_id).first()
-    if not car:
+    if not user_car:
         # if car does not exist (yet)
         session.close()
         return False
@@ -799,7 +809,7 @@ def new_car():
                       consumption_red=consumption_red)
 
         # car user zuweisen
-        user_car = UserCar(name=flask_login.current_user.id, car=car_new)
+        user_car = UserCar(user_id=flask_login.current_user.id, car=car_new)
         session.add(user_car)
         session.commit()
 
@@ -818,14 +828,14 @@ def select_car():
         Session = sessionmaker(bind=engine)
         session = Session()
 
-        if session.query(Car).join(UserCar).filter_by(name=flask_login.current_user.id).count() == 0:
+        if session.query(Car).join(UserCar).filter_by(user_id=flask_login.current_user.id).count() == 0:
             # when no car exists (yet)
             session.close()
             return redirect(url_for('new_car') + "#car_missing")
 
         # existing_cars = session.query(Car).all()
         # existing_user_cars = session.query(UserCar).filter_by(name=flask_login.current_user.id).all()
-        existing_user_cars = session.query(Car).join(UserCar).filter_by(name=flask_login.current_user.id).all()
+        existing_user_cars = session.query(Car).join(UserCar).filter_by(user_id=flask_login.current_user.id).all()
         session.close()
 
         valid_car_selected = False
@@ -1336,6 +1346,8 @@ def edit_repair(repair_id):
         session = Session()
         entry = session.query(CarRepair).filter(CarRepair.car_id == car_id).filter_by(
             car_repair_id=repair_id).first()
+        if not entry:
+            return "Fehler"
         session.close()
         return render_template('change_wartung.html', repair=entry, title="Wartung Eintrag ändern")
     elif request.method == 'POST':
@@ -1367,6 +1379,8 @@ def edit_repair(repair_id):
         entry = session.query(CarRepair).filter(CarRepair.car_id == car_id).filter_by(
             car_repair_id=car_repair_id).first()
 
+        if not entry:
+            return "Fehler"
         entry.cost = cost
         entry.kmstand = kmstand
         entry.description = request.form['che_description']
@@ -1648,6 +1662,53 @@ def edit_fillup(fillup_id):
         return redirect(url_for('tanken'))
 
 
+@app.route('/user', methods=['GET', 'POST'])
+@flask_login.login_required
+def user_creation():
+    if not flask_login.current_user.get_id() or not flask_login.current_user.admin:
+        # return app.login_manager.unauthorized()
+        return "Not allowed ", 403
+
+    form = login_form()
+
+    if form.validate_on_submit():
+        try:
+            user_name = form.user_name.data
+            entered_password = form.password.data
+            Session = sessionmaker(bind=engine)
+            session = Session()
+
+            if len(user_name) >= 50:
+                flash("Username maximal 50 Zeichen!", "danger")
+
+            user = session.query(User).filter(User.user_name == user_name).first()
+
+            if user:
+                flash("User existiert bereits!", "danger")
+                session.close()
+            else:
+                session.close()
+                Session = sessionmaker(bind=engine)
+                session = Session()
+
+                user = User(user_name=user_name, password_hash=generate_password_hash(entered_password), admin=False)
+                session.add(user)
+                session.commit()
+                session.close()
+                flash("Benutzer angelegt", "success")
+
+            session.close()
+        except Exception as e:
+            # flash(e, "danger") # dont expose error messages
+            flash("Fehler!", "danger")
+
+    return render_template("auth.html",
+                           form=form,
+                           text="Benutzer anlegen",
+                           title="Benutzer anlegen",
+                           btn_action="Benutzer anlegen")
+
+
 @app.route('/lib/5/index_js', methods=['GET'])
 @flask_login.login_required
 def return_files_amcharts_index_js():
@@ -1669,11 +1730,6 @@ def return_files_amcharts_animated_js():
 @app.route('/bulma/css/bulma.min.css')
 def return_bulma_css():
     return send_file('httpdocs/bulma/css/bulma.min.css')
-
-
-@app.route('/manifest.json')
-def return_file_manifest_json():
-    return send_file('manifest.json')
 
 
 @app.route('/serviceworker.js')

@@ -9,7 +9,7 @@
     <div class="field">
         <label class="label">Datum</label>
         <div class="control">
-            {{ repair.date }}
+            {{ repair.date.strftime('%d.%m.%Y') }}
         </div>
     </div>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -20,14 +20,14 @@
         <label class="label" for="kmstand">km-Stand:</label>
         <div class="control">
             <input class="input" id="kmstand" min="0.01" name="che_kmstand" required step=".01" type="number"
-                   value="{{ repair.kmstand }}"></div>
+                   value="{{ repair.kmstand | format_number }}"></div>
     </div>
 
     <div class="field">
         <label class="label" for="cost">Kosten:</label>
         <div class="control">
             <input class="input" id="cost" min="0.00" name="che_cost" required step=".01" type="number"
-                   value="{{ repair.cost }}"></div>
+                   value="{{ repair.cost | format_number }}"></div>
     </div>
 
     <div class="field">

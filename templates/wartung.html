@@ -23,10 +23,10 @@
         {% for repair in repaires %}
         <tr id="wartung_{{ repair.car_repair_id }}">
             <td hidden="hidden">{{ repair.car_repair_id }}</td>
-            <td class="date">{{ repair.date }}</td>
-            <td class="cost">{{ repair.cost }}
+            <td class="date" date-timestamp="{{ repair.date }}">{{ repair.date.strftime('%d.%m.%Y') }}</td>
+            <td class="cost">{{ repair.cost | format_number }}
             </td>
-            <td class="kmstand">{{ repair.kmstand }}
+            <td class="kmstand">{{ repair.kmstand | format_number }}
             </td>
             <td class="firma">{{ repair.firma }}</td>
             <td class="comment">{{ repair.description }}</td>
@@ -44,7 +44,7 @@
 </div>
 <script>
 var options = {
-  valueNames: [ 'date', 'cost', 'kmstand', 'firma', 'comment' ]
+  valueNames: [ { name: 'date', attr: 'date-timestamp' }, 'cost', 'kmstand', 'firma', 'comment' ]
   };
 
 // Init list

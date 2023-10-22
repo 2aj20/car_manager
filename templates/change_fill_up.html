@@ -9,7 +9,7 @@
     <div class="field">
         <label class="label">Datum</label>
         <div class="control">
-            {{ fill_up.date }}
+            {{ fill_up.date.strftime('%d.%m.%Y') }}
         </div>
     </div>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -20,7 +20,7 @@
         <label class="label">Liter</label>
         <div class="control">
             <input class="input" min="0.01" name="che_gallons" required step=".01" type="number"
-                   value="{{ fill_up.gallons }}">
+                   value="{{ fill_up.gallons | format_number }}">
         </div>
     </div>
 
@@ -28,7 +28,7 @@
         <label class="label">Preis</label>
         <div class="control">
             <input class="input" min="0.01" name="che_total_cost" required step=".01" type="number"
-                   value="{{ fill_up.total_cost }}">
+                   value="{{ fill_up.total_cost | format_number }}">
         </div>
     </div>
 
@@ -36,7 +36,7 @@
         <label class="label">Gef. Km</label>
         <div class="control">
             <input class="input" min="0.01" name="che_drived_meters" required step=".01" type="number"
-                   value="{{ fill_up.drived_meters }}">
+                   value="{{ fill_up.drived_meters | format_number }}">
         </div>
     </div>
 

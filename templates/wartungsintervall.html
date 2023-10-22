@@ -39,13 +39,13 @@
         <!-- ssti template injection!!!! -->
         {% for repair_done in repair.repaires_dones %}
         <tr id="done_arbeit_{{ repair_done.car_repair_done_id }}">
-            <td class="startdate">{{ repair_done.begin_date }}
+            <td class="startdate" date-timestamp="{{ repair_done.begin_date }}">{{ repair_done.begin_date.strftime('%d.%m.%Y') }}
             </td>
-            <td class="begin_kmstand">{{ repair_done.begin_kmstand }}
+            <td class="begin_kmstand">{{ repair_done.begin_kmstand | format_number }}
             </td>
-            <td class="enddate">{% if repair_done.end_date %}{{ repair_done.end_date }}{% endif %}</td>
-            <td class="end_kmstand">{% if repair_done.end_kmstand %}{{ repair_done.end_kmstand }}{% endif %}</td>
-            <td class="laufzeit">{{ repair_done.laufzeit }}</td>
+            <td class="enddate" {% if repair_done.end_date %}date-timestamp="{{ repair_done.end_date }}"{% endif %}>{% if repair_done.end_date %}{{ repair_done.end_date.strftime('%d.%m.%Y') }}{% endif %}</td>
+            <td class="end_kmstand">{% if repair_done.end_kmstand %}{{ repair_done.end_kmstand | format_number }}{% endif %}</td>
+            <td class="laufzeit">{{ repair_done.laufzeit | format_number }}</td>
             <td class="description">{{ repair_done.description }}</td>
             <td>
                 <a class="button"
@@ -67,7 +67,7 @@
 </div>
 <script>
 var options = {
-  valueNames: [ 'description', 'startdate', 'begin_kmstand', 'enddate', 'end_kmstand', 'laufzeit' ]
+  valueNames: [ 'description', { name: 'startdate', attr: 'date-timestamp' }, 'begin_kmstand', { name: 'enddate', attr: 'date-timestamp' }, 'end_kmstand', 'laufzeit' ]
   };
 
 // Init list

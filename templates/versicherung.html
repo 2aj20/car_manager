@@ -19,8 +19,8 @@
         {% for insurance in insurances %}
         <tr id="versicherung_{{ insurance.car_insurance_id }}">
             <td hidden="hidden">{{ insurance.car_insurance_id }}</td>
-            <td class="date">{{ insurance.date }}</td>
-            <td  class="cost">{{ insurance.cost }}
+            <td class="date" date-timestamp="{{ insurance.date }}">{{ insurance.date.strftime('%d.%m.%Y') }}</td>
+            <td  class="cost">{{ insurance.cost | format_number }}
             </td>
             <td class="comment"> {{ insurance.description }}</td>
             <td>
@@ -40,7 +40,7 @@
 </div>
 <script>
 var options = {
-  valueNames: [ 'date', 'cost' , 'comment' ]
+  valueNames: [ { name: 'date', attr: 'date-timestamp' }, 'cost' , 'comment' ]
   };
 
 // Init list

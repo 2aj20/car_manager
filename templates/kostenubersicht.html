@@ -32,28 +32,28 @@
         {% for item in list_table_data %}
         <tr>
             <td class="year">{{ item.year }}</td>
-            <td class="drived_meters">{{ item.drived_meters }}</td>
-            <td class="tankcost">{{ item.tankcost }}</td>
-            <td class="insurance">{{ item.insurance }}</td>
-            <td class="tax">{{ item.tax }}</td>
-            <td class="repair">{{ item.repair }}</td>
-            <td class="costs">{{ item.costs }}</td>
-            <td class="costs_per_kilometer">{{ item.costs_per_kilometer }}</td>
+            <td class="drived_meters">{{ item.drived_meters | format_number }}</td>
+            <td class="tankcost">{{ item.tankcost | format_number }}</td>
+            <td class="insurance">{{ item.insurance | format_number }}</td>
+            <td class="tax">{{ item.tax | format_number }}</td>
+            <td class="repair">{{ item.repair | format_number }}</td>
+            <td class="costs">{{ item.costs | format_number }}</td>
+            <td class="costs_per_kilometer">{{ item.costs_per_kilometer | format_number }}</td>
         </tr>
         {% endfor %}
         </tbody>
         <tfoot>
         <tr>
             <th>Gesamt</th>
-            <th>{{gesamt_drived_kilometers}}</th>
-            <th>{{gesamt_tank_cost}}</th>
-            <th>{{gesamt_insurance}}<br><a class="button" href="{{ url_for('versicherung') }}">Ändern</a></th>
-            <th>{{gesamt_tax}}<br><a class="button" href="{{ url_for('steuer') }}">Ändern</a></th>
-            <th>{{gesamt_repair}}</th>
-            <th>{{gesamt}}</th>
+            <th>{{gesamt_drived_kilometers | format_number}}</th>
+            <th>{{gesamt_tank_cost | format_number}}</th>
+            <th>{{gesamt_insurance | format_number}}<br><a class="button" href="{{ url_for('versicherung') }}">Ändern</a></th>
+            <th>{{gesamt_tax | format_number}}<br><a class="button" href="{{ url_for('steuer') }}">Ändern</a></th>
+            <th>{{gesamt_repair | format_number}}</th>
+            <th>{{gesamt | format_number}}</th>
             <th>
-                <div title="Gesamtkosten (ohne Kaufpreis)/gef. km">{{gesamt_pro_kilometer}}*</div>
-                <div title="Durchschnitt der oberen Werte">{{durchschnitt_pro_kilometer}}*</div>
+                <div title="Gesamtkosten (ohne Kaufpreis)/gef. km">{{gesamt_pro_kilometer | format_number}}*</div>
+                <div title="Durchschnitt der oberen Werte">{{durchschnitt_pro_kilometer | format_number}}*</div>
             </th>
         </tr>
         </tfoot>
@@ -73,12 +73,12 @@ var list_yearsList = new List('list_years', options);
     <tbody>
     <tr>
         <td>Laufende Kosten</td>
-        <td>{{gesamt}}</td>
+        <td>{{gesamt | format_number}}</td>
     </tr>
     <tr>
         <td>Kauf-Preis</td>
         <td>
-            {{ buy_cost }}
+            {{ buy_cost | format_number }}
         <td>
         <td>
             <a class="button" href="{{ url_for('change_car') }}">Ändern</a>
@@ -86,19 +86,19 @@ var list_yearsList = new List('list_years', options);
     </tr>
     <tr>
         <td>Kosten/Monat inkl Kaufpreis</td>
-        <td>{{costs_per_month_inkl_kaufpreis}}</td>
+        <td>{{costs_per_month_inkl_kaufpreis | format_number}}</td>
     </tr>
     <tr>
         <td>Kosten/Monat ohne Kaufpreis</td>
-        <td>{{costs_per_month_ohne_kaufpreis}}</td>
+        <td>{{costs_per_month_ohne_kaufpreis | format_number}}</td>
     </tr>
     <tr>
         <td>Gesamtkosten inkl Kaufpreis</td>
-        <td>{{gesamtkosten_inkl_kaufpreis}}</td>
+        <td>{{gesamtkosten_inkl_kaufpreis | format_number}}</td>
     </tr>
     <tr>
         <td>Kosten pro Kilometer inkl Kaufpreis (in Cent)</td>
-        <td>{{gesamt_pro_kilometer_inkl_kaufpreis}}</td>
+        <td>{{gesamt_pro_kilometer_inkl_kaufpreis | format_number}}</td>
     </tr>
     </tbody>
 </table>
@@ -114,7 +114,7 @@ var list_yearsList = new List('list_years', options);
     <tr>
         <td>bei Kauf :</td>
         <td>
-            {{ buy_kmstand }}
+            {{ buy_kmstand | format_number }}
         <td>
         <td>
             <a class="button" href="{{ url_for('change_car') }}">Ändern</a>
@@ -122,11 +122,11 @@ var list_yearsList = new List('list_years', options);
     </tr>
     <tr>
         <td>gefahren:</td>
-        <td>{{gesamt_drived_kilometers}}</td>
+        <td>{{gesamt_drived_kilometers | format_number}}</td>
     </tr>
     <tr>
         <td>Laufleistung:</td>
-        <td>{{laufleistung}}</td>
+        <td>{{laufleistung | format_number}}</td>
     </tr>
     </tbody>
 </table>

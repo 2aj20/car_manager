@@ -97,7 +97,7 @@ function submitForm() {
         <label class="label">Preis</label>
         <div class="control">
             <input class="input" min="0.01" name="che_buy_cost" required step=".01" type="number"
-                   value="{{ car.buy_cost }}">
+                   value="{{ car.buy_cost | format_number }}">
         </div>
     </div>
 
@@ -105,19 +105,19 @@ function submitForm() {
         <label class="label">Kilometerstand (beim Kauf)</label>
         <div class="control ">
             <input class="input" min="0.01" name="che_buy_kmstand" required step=".01" type="number"
-                   value="{{ car.buy_kmstand }}"></div>
+                   value="{{ car.buy_kmstand | format_number }}"></div>
     </div>
 
    <div class="field ">
         <label class="label">Verbrauch kleiner als grün anzeigen</label>
         <div class="control ">
-            <input class="input" min="0.01" name="consumption_green" required step=".01" type="number" value="{{ car.consumption_green }}"></div>
+            <input class="input" min="0.01" name="consumption_green" required step=".01" type="number" value="{{ car.consumption_green | format_number }}"></div>
     </div>
 
     <div class="field ">
         <label class="label">Verbrauch größer als rot anzeigen</label>
         <div class="control ">
-            <input class="input" min="0.01" name="consumption_red" required step=".01" type="number" value="{{ car.consumption_red }}"></div>
+            <input class="input" min="0.01" name="consumption_red" required step=".01" type="number" value="{{ car.consumption_red | format_number }}"></div>
     </div>
 
 
