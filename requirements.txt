@@ -1,6 +1,6 @@
 sqlalchemy==2.0.22
 flask==3.0.0
-Flask-Login==0.6.2
+Flask-Login==0.6.3
 bcrypt==4.0.1
 importlib-metadata==6.8.0
 pymysql==1.1.0
