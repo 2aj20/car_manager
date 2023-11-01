@@ -304,7 +304,7 @@ def tanken():
     session = Session()
 
     buy_kmstand = session.query(Car).filter(Car.car_id == car_id).scalar().buy_kmstand
-    fill_ups = session.query(FillUp).filter(FillUp.car_id == car_id).order_by(FillUp.fill_up_id.desc()).all()
+    fill_ups = session.query(FillUp).filter(FillUp.car_id == car_id).order_by(FillUp.fill_up_id).all()
     if len(fill_ups) > 0:
         # total_kilometers = session.query(func.sum(FillUp.drived_meters)).scalar()
         # print(f"sqlalchemy calculated total_kilometers: {total_kilometers}")
@@ -342,6 +342,7 @@ def tanken():
             drived_kilometers += fill_up.drived_meters
             fill_up.kilometers_after_fillup = drived_kilometers
 
+        fill_ups = sorted(fill_ups, key=lambda d: d.fill_up_id, reverse=True)
         av_price_per_liter = round(mean([fill_up.price_per_gallon for fill_up in fill_ups]), 2)
         # print(f"python calculated av_price_per_liter: {av_price_per_liter}")
 
